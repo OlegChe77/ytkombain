@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% from "partials/ui.html" import icon, breadcrumbs, faq_list, tool_clip, url_form, comments_options %}
+{% block body_class %}page-tool{% endblock %}
+{% block main %}
+<div class="tool" style="--track: var(--c-{{ category.slug }})">
+  <div class="container">
+    {{ breadcrumbs(meta.breadcrumbs) }}
+    <header class="tool-head">
+      <h1>{{ tool.h1 }}</h1>
+      <p class="lead">{{ tool.lead }}</p>
+    </header>
+    <section class="workspace" id="tool-root" aria-label="{{ tool.name }}"{% for k, v in tool.extra.items() %} data-{{ k }}="{{ v }}"{% endfor %}>
+      {% block workspace %}{% endblock %}
+    </section>
+  </div>
+
+  <div class="container docs">
+    <article class="prose">
+      {% block guide %}{% endblock %}
+      <section class="faq" aria-labelledby="faq-title">
+        <h2 id="faq-title">Частые вопросы</h2>
+        {{ faq_list(tool.faq) }}
+      </section>
+    </article>
+    <aside class="related" aria-labelledby="related-title">
+      <h2 id="related-title" class="h4">Пригодится дальше</h2>
+      <div class="related-list">
+        {% for t in related %}{{ tool_clip(t, compact=true) }}{% endfor %}
+      </div>
+      <a class="related-more" href="/category/{{ category.slug }}">Вся категория «{{ category.name }}»</a>
+    </aside>
+  </div>
+</div>
+{% endblock %}
+{% block scripts %}<script type="module" src="{{ static('js/tools/' ~ tool.script ~ '.js') }}"></script>{% endblock %}

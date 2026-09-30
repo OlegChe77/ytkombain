@@ -1,0 +1,50 @@
+{% macro switch(name, label, checked=false) -%}
+<label class="switch">
+  <input type="checkbox" name="{{ name }}"{% if checked %} checked{% endif %}>
+  <span class="switch-track" aria-hidden="true"></span>
+  <span>{{ label }}</span>
+</label>
+{%- endmacro %}
+
+{% macro filters(id, fields, unique_label='Один комментарий на автора', unique_on=false, no_replies_on=true) -%}
+<form class="filters" id="{{ id }}" novalidate>
+  {% if 'include' in fields %}
+  <label class="text-field">
+    <span>Содержит слова</span>
+    <input type="text" name="include" placeholder="через запятую, например: хочу, участвую" autocomplete="off">
+  </label>
+  {% endif %}
+  {% if 'exclude' in fields %}
+  <label class="text-field">
+    <span>Не содержит слов</span>
+    <input type="text" name="exclude" placeholder="через запятую" autocomplete="off">
+  </label>
+  {% endif %}
+  {% if 'length' in fields %}
+  <div class="field-pair">
+    <label class="text-field">
+      <span>Длина от, символов</span>
+      <input type="number" name="min_len" min="0" max="5000" inputmode="numeric" placeholder="0">
+    </label>
+    {% if 'max_len' in fields %}
+    <label class="text-field">
+      <span>до</span>
+      <input type="number" name="max_len" min="0" max="5000" inputmode="numeric" placeholder="без ограничений">
+    </label>
+    {% endif %}
+  </div>
+  {% endif %}
+  {% if 'users' in fields %}
+  <label class="text-field text-field-wide">
+    <span>Исключить пользователей</span>
+    <textarea name="exclude_users" rows="2" placeholder="@имя — по одному в строке или через запятую"></textarea>
+  </label>
+  {% endif %}
+  <div class="switches">
+    {% if 'unique' in fields %}{{ switch('unique', unique_label, unique_on) }}{% endif %}
+    {% if 'no_replies' in fields %}{{ switch('no_replies', 'Без ответов на комментарии', no_replies_on) }}{% endif %}
+    {% if 'no_links' in fields %}{{ switch('no_links', 'Без ссылок') }}{% endif %}
+    {% if 'no_owner' in fields %}{{ switch('no_owner', 'Без автора канала', true) }}{% endif %}
+  </div>
+</form>
+{%- endmacro %}

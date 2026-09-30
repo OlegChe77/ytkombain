@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% from "partials/ui.html" import breadcrumbs, faq_list %}
+{% block body_class %}page-faq{% endblock %}
+{% block main %}
+<div class="container narrow page-head">
+  {{ breadcrumbs(meta.breadcrumbs) }}
+  <h1>Вопросы и ответы</h1>
+  <p class="lead">Общие вопросы о Комбайне. Ответы по конкретному инструменту — внизу его страницы: ссылки на них ниже.</p>
+</div>
+<div class="container narrow">
+  <section aria-labelledby="general-title">
+    <h2 id="general-title" class="sr-only">Общие вопросы</h2>
+    {{ faq_list(faq) }}
+  </section>
+  {% for cat in categories %}
+  <section class="faq-group" aria-labelledby="faq-{{ cat.slug }}" style="--track: var(--c-{{ cat.slug }})">
+    <h2 id="faq-{{ cat.slug }}"><span class="swatch" aria-hidden="true"></span>{{ cat.name }}</h2>
+    <ul class="faq-links">
+      {% for t in tools_in(cat.slug) %}
+      <li>
+        <a href="{{ t.path }}">{{ t.h1 }}</a>
+        <span>{% for q, a in t.faq[:3] %}{{ q }} {% endfor %}</span>
+      </li>
+      {% endfor %}
+    </ul>
+  </section>
+  {% endfor %}
+</div>
+{% endblock %}

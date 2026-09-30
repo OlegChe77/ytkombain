@@ -1,0 +1,226 @@
+{% extends "tools/_layout.html" %}
+{% from "partials/ui.html" import icon, url_form %}
+{% from "partials/comments.html" import switch %}
+{% block head %}
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Amatic+SC:wght@700&family=Caveat:wght@700&family=Comfortaa:wght@700&family=Lobster&family=Montserrat:wght@800&family=Oswald:wght@700&family=Pacifico&family=Press+Start+2P&family=Rubik+Glitch&family=Rubik+Mono+One&family=Russo+One&display=swap">
+{% endblock %}
+{% block workspace %}
+{{ url_form('ed-form', 'Ссылка на видео или Shorts', 'Открыть в редакторе', 'video', autostart=false) }}
+<div class="notice" role="note">
+  {{ icon('info') }}
+  <p>Используйте фрагменты, на которые у вас есть права: свои ролики, видео со свободной лицензией или цитаты с указанием источника. Соблюдайте <a href="https://www.youtube.com/t/terms" target="_blank" rel="noopener">правила YouTube</a> и законы своей страны.</p>
+</div>
+<div class="result" id="ed-status" hidden></div>
+
+<div class="editor" id="editor" hidden>
+  <div class="editor-main">
+    <div class="stage-box">
+      <div class="frame" id="frame">
+        <canvas class="frame-bg" id="frame-bg" width="96" height="170" aria-hidden="true"></canvas>
+        <video class="frame-video" id="frame-video" playsinline preload="auto" crossorigin="anonymous"></video>
+        <div class="frame-progress" id="frame-progress" hidden><span></span></div>
+        <div class="frame-layers" id="frame-layers"></div>
+        <div class="guide guide-v" hidden></div>
+        <div class="guide guide-h" hidden></div>
+        <div class="safe-zones" id="safe-zones" hidden aria-hidden="true">
+          <span class="sz sz-top">Заголовок</span><span class="sz sz-side">Кнопки</span><span class="sz sz-bottom">Подпись и музыка</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="transport">
+      <button class="play-btn" type="button" id="ed-play" aria-label="Воспроизвести">{{ icon('play') }}</button>
+      <span class="ed-time num" id="ed-time">0:00.0</span>
+      <button class="btn btn-secondary btn-xs" type="button" id="ed-set-start">{{ icon('flag-start') }}Начало здесь</button>
+      <button class="btn btn-secondary btn-xs" type="button" id="ed-set-end">{{ icon('flag-end') }}Конец здесь</button>
+      <button class="btn btn-ghost btn-xs" type="button" id="ed-loop" aria-pressed="true">{{ icon('loop') }}По кругу</button>
+    </div>
+
+    <div class="range" id="ed-range">
+      <div class="range-track" id="range-track"><span class="range-sel"></span><span class="range-head"></span></div>
+      <input type="range" id="range-start" min="0" max="1" step="0.1" value="0" aria-label="Начало отрезка">
+      <input type="range" id="range-end" min="0" max="1" step="0.1" value="1" aria-label="Конец отрезка">
+    </div>
+    <div class="range-fields">
+      <label class="text-field"><span>Начало</span><input type="text" id="ed-start" inputmode="decimal" autocomplete="off"></label>
+      <label class="text-field"><span>Конец</span><input type="text" id="ed-end" inputmode="decimal" autocomplete="off"></label>
+      <p class="range-info" id="ed-length" aria-live="polite"></p>
+    </div>
+  </div>
+
+  <div class="editor-side panel">
+    <div class="segmented ed-tabs" role="tablist" aria-label="Настройки клипа">
+      <button type="button" role="tab" aria-selected="true" aria-controls="tab-frame" id="t-frame">Кадр</button>
+      <button type="button" role="tab" aria-selected="false" aria-controls="tab-text" id="t-text">Титры</button>
+      <button type="button" role="tab" aria-selected="false" aria-controls="tab-audio" id="t-audio">Звук</button>
+      <button type="button" role="tab" aria-selected="false" aria-controls="tab-extra" id="t-extra">Фишки</button>
+    </div>
+
+    <section class="ed-pane" id="tab-frame" role="tabpanel" aria-labelledby="t-frame">
+      <fieldset class="fieldset">
+        <legend>Формат</legend>
+        <div class="format-picker" role="radiogroup" aria-label="Формат">
+          <button type="button" role="radio" data-format="9:16" aria-checked="true"><i style="aspect-ratio: 9 / 16"></i><span><strong>9:16</strong>Shorts, Reels, Stories</span></button>
+          <button type="button" role="radio" data-format="1:1" aria-checked="false"><i style="aspect-ratio: 1"></i><span><strong>1:1</strong>Квадрат</span></button>
+          <button type="button" role="radio" data-format="4:5" aria-checked="false"><i style="aspect-ratio: 4 / 5"></i><span><strong>4:5</strong>Лента Instagram</span></button>
+          <button type="button" role="radio" data-format="16:9" aria-checked="false"><i style="aspect-ratio: 16 / 9"></i><span><strong>16:9</strong>Горизонтальное</span></button>
+        </div>
+      </fieldset>
+      <fieldset class="fieldset">
+        <legend>Видео в кадре</legend>
+        <div class="segmented" role="group" aria-label="Размещение">
+          <button type="button" data-fit="cover" aria-pressed="true">Заполнить кадр</button>
+          <button type="button" data-fit="contain" aria-pressed="false">Вписать целиком</button>
+        </div>
+        <div class="bg-row" id="bg-row">
+          <div class="segmented" role="group" aria-label="Фон">
+            <button type="button" data-bg="blur" aria-pressed="true">Размытый фон</button>
+            <button type="button" data-bg="color" aria-pressed="false">Цвет</button>
+          </div>
+          <input type="color" id="ed-bg-color" value="#101014" aria-label="Цвет фона">
+        </div>
+        <label class="range-field"><span>Масштаб <output id="ed-zoom-out">100%</output></span>
+          <input type="range" id="ed-zoom" min="50" max="300" step="5" value="100"></label>
+        <p class="field-hint">Перетащите видео в кадре, чтобы выбрать, что попадёт в клип.</p>
+        <button class="btn btn-secondary btn-sm" type="button" id="ed-center">По центру</button>
+      </fieldset>
+      <fieldset class="fieldset">
+        <legend>Скорость</legend>
+        <div class="chips" role="group" aria-label="Скорость">
+          {% for s in ['0.5', '0.75', '1', '1.25', '1.5', '2'] %}
+          <button type="button" class="chip{% if s == '1' %} is-active{% endif %}" data-speed="{{ s }}">{{ s|replace('.', ',') }}×</button>
+          {% endfor %}
+        </div>
+      </fieldset>
+      <fieldset class="fieldset">
+        <legend>Переходы</legend>
+        <div class="switches">
+          {{ switch('fade_in', 'Плавное появление из чёрного') }}
+          {{ switch('fade_out', 'Плавное затемнение в конце') }}
+        </div>
+      </fieldset>
+    </section>
+
+    <section class="ed-pane" id="tab-text" role="tabpanel" aria-labelledby="t-text" hidden>
+      <div class="ed-add">
+        <button class="btn btn-primary btn-sm" type="button" id="ed-add-text">{{ icon('plus') }}Текст</button>
+        <button class="btn btn-secondary btn-sm" type="button" id="ed-subs">{{ icon('captions') }}Субтитры из видео</button>
+      </div>
+      <p class="field-hint" id="ed-subs-hint" aria-live="polite"></p>
+      <div class="presets" id="ed-presets" aria-label="Готовые стили"></div>
+      <div class="emoji-row" id="ed-emoji" aria-label="Стикеры-эмодзи"></div>
+      <ol class="layer-list" id="layer-list" aria-label="Слои титров"></ol>
+      <form class="layer-editor" id="layer-editor" hidden novalidate>
+        <label class="text-field text-field-wide"><span>Текст</span><textarea name="text" rows="2" maxlength="300"></textarea></label>
+        <label class="select-field"><span>Шрифт</span><select name="font" id="ed-font"></select></label>
+        <label class="range-field"><span>Размер <output data-out="size"></output></span><input type="range" name="size" min="2" max="24" step="0.5"></label>
+        <div class="color-row">
+          <label><span>Текст</span><input type="color" name="color"></label>
+          <label><span>Обводка</span><input type="color" name="strokeColor"></label>
+          <label><span>Плашка</span><input type="color" name="bgColor"></label>
+        </div>
+        <label class="range-field"><span>Толщина обводки <output data-out="strokeWidth"></output></span><input type="range" name="strokeWidth" min="0" max="0.25" step="0.01"></label>
+        <div class="switches">
+          {{ switch('bg', 'Плашка под текстом') }}
+          {{ switch('shadow', 'Тень') }}
+          {{ switch('glow', 'Неоновое свечение') }}
+          {{ switch('upper', 'ЗАГЛАВНЫМИ БУКВАМИ') }}
+        </div>
+        <label class="select-field"><span>Анимация</span>
+          <select name="anim">
+            <option value="none">Без анимации</option>
+            <option value="fade">Плавно появляется</option>
+            <option value="slide">Выезжает снизу</option>
+            <option value="pop">Выпрыгивает</option>
+          </select>
+        </label>
+        <div class="field-pair">
+          <label class="text-field"><span>Показывать с, с</span><input type="text" name="start" inputmode="decimal" autocomplete="off"></label>
+          <label class="text-field"><span>до, с</span><input type="text" name="end" inputmode="decimal" autocomplete="off" placeholder="до конца"></label>
+        </div>
+        <div class="results-actions">
+          <button class="btn btn-secondary btn-xs" type="button" data-act="from-now">С текущего момента</button>
+          <button class="btn btn-secondary btn-xs" type="button" data-act="to-now">До текущего момента</button>
+          <button class="btn btn-secondary btn-xs" type="button" data-act="duplicate">{{ icon('copy') }}Копия</button>
+          <button class="btn btn-secondary btn-xs" type="button" data-act="style-all" hidden>Стиль на все субтитры</button>
+          <button class="btn btn-ghost btn-xs btn-danger" type="button" data-act="delete">{{ icon('trash') }}Удалить</button>
+        </div>
+      </form>
+    </section>
+
+    <section class="ed-pane" id="tab-audio" role="tabpanel" aria-labelledby="t-audio" hidden>
+      <fieldset class="fieldset">
+        <legend>Звук видео</legend>
+        <label class="range-field"><span>Громкость <output id="ed-volume-out">100%</output></span><input type="range" id="ed-volume" min="0" max="200" step="5" value="100"></label>
+        <button class="btn btn-secondary btn-sm" type="button" id="ed-mute" aria-pressed="false">{{ icon('volume-off') }}Выключить звук видео</button>
+      </fieldset>
+      <fieldset class="fieldset">
+        <legend>Своя музыка</legend>
+        <label class="dropzone" id="ed-drop">
+          <input type="file" id="ed-music" accept="audio/*,.mp3,.m4a,.wav,.ogg,.flac" class="sr-only">
+          {{ icon('upload') }}<span><strong>Выберите или перетащите трек</strong><small>MP3, M4A, WAV, OGG или FLAC до {{ settings.editor_max_audio_mb }} МБ</small></span>
+        </label>
+        <div class="music-info" id="ed-music-info" hidden></div>
+        <div id="ed-music-controls" hidden>
+          <label class="range-field"><span>Громкость музыки <output id="ed-mvol-out">80%</output></span><input type="range" id="ed-mvol" min="0" max="200" step="5" value="80"></label>
+          <label class="text-field"><span>Начать трек с, секунд</span><input type="text" id="ed-moffset" inputmode="decimal" value="0" autocomplete="off"></label>
+          <label class="switch"><input type="checkbox" id="ed-mfade" checked><span class="switch-track" aria-hidden="true"></span><span>Плавно затухает в конце</span></label>
+        </div>
+      </fieldset>
+    </section>
+
+    <section class="ed-pane" id="tab-extra" role="tabpanel" aria-labelledby="t-extra" hidden>
+      <fieldset class="fieldset">
+        <legend>Полоса прогресса</legend>
+        <div class="bg-row">
+          <div class="segmented" role="group" aria-label="Полоса прогресса">
+            <button type="button" data-progress="none" aria-pressed="true">Нет</button>
+            <button type="button" data-progress="top" aria-pressed="false">Сверху</button>
+            <button type="button" data-progress="bottom" aria-pressed="false">Снизу</button>
+          </div>
+          <input type="color" id="ed-progress-color" value="#ff3b6b" aria-label="Цвет полосы">
+        </div>
+        <p class="field-hint">Тонкая полоса показывает, сколько осталось до конца, — зрители реже пролистывают ролик.</p>
+      </fieldset>
+      <fieldset class="fieldset">
+        <legend>Подсказки</legend>
+        <label class="switch"><input type="checkbox" id="ed-safe"><span class="switch-track" aria-hidden="true"></span><span>Показать зоны интерфейса Shorts и TikTok</span></label>
+        <p class="field-hint">Не ставьте важный текст в подсвеченные зоны: там кнопки и подпись приложения. В видео зоны не попадают.</p>
+      </fieldset>
+      <fieldset class="fieldset">
+        <legend>Обложка</legend>
+        <button class="btn btn-secondary btn-sm" type="button" id="ed-cover">{{ icon('image') }}Сохранить текущий кадр как PNG</button>
+        <p class="field-hint">Кадр сохранится вместе с титрами — готовая обложка для Shorts или Stories.</p>
+      </fieldset>
+    </section>
+  </div>
+
+  <div class="editor-export panel">
+    <p class="export-summary" id="ed-summary"></p>
+    <button class="btn btn-primary btn-lg" type="button" id="ed-render">{{ icon('film') }}Создать видео</button>
+    <div class="export-result" id="ed-result" hidden></div>
+  </div>
+</div>
+{% endblock %}
+
+{% block guide %}
+<h2>Как сделать шортс из видео ютуб</h2>
+<ol>
+  <li>Вставьте ссылку на ролик и нажмите «Открыть в редакторе» — Комбайн загрузит видео, обычно это занимает до минуты.</li>
+  <li>Найдите момент: включите воспроизведение и нажмите «Начало здесь» и «Конец здесь» или передвиньте ползунки.</li>
+  <li>Выберите формат и способ размещения. Горизонтальное видео можно обрезать по центру кадра или вписать целиком с размытым фоном.</li>
+  <li>Добавьте титры, эмодзи или субтитры из самого ролика и перетащите их на нужное место.</li>
+  <li>При желании выключите исходный звук и добавьте свою музыку, затем нажмите «Создать видео».</li>
+</ol>
+<h2>Что умеет редактор</h2>
+<h3>Форматы</h3>
+<p>9:16 (1080×1920) — для YouTube Shorts, Instagram Reels, TikTok и Stories. 1:1 и 4:5 — для ленты Instagram и других соцсетей, 16:9 — для обычных роликов и превью.</p>
+<h3>Титры</h3>
+<p>Десяток шрифтов с кириллицей — от строгого Montserrat до рукописного Caveat и пиксельного Press Start 2P, обводка, плашка, тень и неон. Каждый титр можно показывать в своё время и с анимацией: появление, выезд снизу или «выпрыгивание». Субтитры из видео подставляются автоматически и совпадают с речью.</p>
+<h3>Фишки для охватов</h3>
+<p>Полоса прогресса удерживает зрителя до конца ролика. Зоны интерфейса Shorts и TikTok подсказывают, куда не ставить текст. Ускорение до 2× помогает уложить длинный момент в короткий клип, а обложку можно сохранить одним нажатием.</p>
+<h2>Ограничения</h2>
+<p>В редактор загружаются публичные видео длительностью до {{ settings.editor_max_source_min }} минут, клип — до {{ settings.editor_max_clip_s }} секунд. Исходник загружается в качестве до 720p: этого хватает для телефонов, а обработка занимает секунды, а не минуты. Сессия редактора хранится час с последнего действия.</p>
+<h3>Частые ошибки</h3>
+<p>Если текст оказался под кнопками приложения, включите зоны интерфейса во вкладке «Фишки». Если музыка заглушает речь, уменьшите её громкость до 30–40%. Если клип получился длиннее допустимого, укоротите отрезок или выберите скорость 1,25–1,5×.</p>
+{% endblock %}

@@ -1,0 +1,65 @@
+{% from "partials/ui.html" import icon, logo_mark %}
+<header class="site-header">
+  <div class="container header-row">
+    <a class="logo" href="/" aria-label="YouTube Комбайн — на главную">
+      {{ logo_mark() }}
+      <span class="logo-text">YouTube Комбайн</span>
+    </a>
+
+    <nav class="main-nav" aria-label="Основная навигация">
+      <div class="nav-item" data-menu>
+        <button class="nav-link" type="button" aria-expanded="false" aria-controls="menu-tools">
+          Инструменты {{ icon('chevron-down', 'nav-chevron') }}
+        </button>
+        <div class="menu mega" id="menu-tools" hidden>
+          <div class="mega-grid">
+            {% for cat in categories %}
+            <div class="mega-col" style="--track: var(--c-{{ cat.slug }})">
+              <a class="mega-title" href="/category/{{ cat.slug }}">{{ cat.name }}</a>
+              <ul>
+                {% for t in tools_in(cat.slug) %}
+                <li><a href="{{ t.path }}">{{ icon(t.icon) }}<span>{{ t.name }}</span></a></li>
+                {% endfor %}
+              </ul>
+            </div>
+            {% endfor %}
+          </div>
+          <div class="mega-foot">
+            <a href="/tools">Все {{ tools|length }} инструментов на одной странице</a>
+            <button type="button" class="link-btn" data-open-search>Поиск по задаче <kbd>Ctrl</kbd><kbd>K</kbd></button>
+          </div>
+        </div>
+      </div>
+      <div class="nav-item" data-menu>
+        <button class="nav-link" type="button" aria-expanded="false" aria-controls="menu-cats">
+          Категории {{ icon('chevron-down', 'nav-chevron') }}
+        </button>
+        <div class="menu dropdown" id="menu-cats" hidden>
+          <ul>
+            {% for cat in categories %}
+            <li style="--track: var(--c-{{ cat.slug }})">
+              <a href="/category/{{ cat.slug }}">
+                <span class="swatch" aria-hidden="true"></span>
+                <span><strong>{{ cat.name }}</strong><small>{{ cat.short }}</small></span>
+              </a>
+            </li>
+            {% endfor %}
+          </ul>
+        </div>
+      </div>
+      <a class="nav-link" href="/faq">FAQ</a>
+    </nav>
+
+    <div class="header-actions">
+      <button class="search-trigger" type="button" data-open-search aria-label="Поиск инструмента">
+        {{ icon('search') }}<span class="search-trigger-text">Найти инструмент</span><kbd>Ctrl K</kbd>
+      </button>
+      <button class="icon-btn" type="button" data-theme-toggle aria-label="Включить светлую тему">
+        {{ icon('sun', 'theme-icon-light') }}{{ icon('moon', 'theme-icon-dark') }}
+      </button>
+      <button class="icon-btn menu-toggle" type="button" data-open-drawer aria-label="Открыть меню">
+        {{ icon('menu') }}
+      </button>
+    </div>
+  </div>
+</header>

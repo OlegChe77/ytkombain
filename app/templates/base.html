@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="ru" data-theme="dark">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>{{ meta.full_title }}</title>
+  <meta name="description" content="{{ meta.description }}">
+  {% if not meta.noindex %}<link rel="canonical" href="{{ meta.canonical }}">{% endif %}
+  {% if meta.noindex %}<meta name="robots" content="noindex, follow">{% else %}<meta name="robots" content="index, follow, max-image-preview:large">{% endif %}
+  {% if settings.yandex_verification %}<meta name="yandex-verification" content="{{ settings.yandex_verification }}">{% endif %}
+  {% if settings.google_verification %}<meta name="google-site-verification" content="{{ settings.google_verification }}">{% endif %}
+  <meta name="theme-color" content="#1b1c21" media="(prefers-color-scheme: dark)">
+  <meta name="theme-color" content="#f3f4f6" media="(prefers-color-scheme: light)">
+  <meta name="color-scheme" content="dark light">
+  <meta name="application-name" content="{{ settings.site_name }}">
+  <meta name="apple-mobile-web-app-title" content="Комбайн">
+  <meta name="format-detection" content="telephone=no">
+  <script>{{ theme_boot|safe }}</script>
+  <link rel="preload" href="/static/fonts/geologica-cyrillic.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="{{ css_url() }}">
+  <link rel="modulepreload" href="/static/js/core/dom.js">
+  <link rel="modulepreload" href="/static/js/core/url-form.js">
+  <link rel="icon" href="/favicon.ico" sizes="32x32">
+  <link rel="icon" href="{{ static('img/favicon.svg') }}" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="{{ static('img/apple-touch-icon.png') }}">
+  <link rel="manifest" href="/manifest.webmanifest">
+
+  <meta property="og:type" content="{{ meta.og_type }}">
+  <meta property="og:site_name" content="{{ settings.site_name }}">
+  <meta property="og:locale" content="ru_RU">
+  <meta property="og:title" content="{{ meta.title }}">
+  <meta property="og:description" content="{{ meta.description }}">
+  {% if not meta.noindex %}<meta property="og:url" content="{{ meta.canonical }}">{% endif %}
+  <meta property="og:image" content="{{ meta.og_image_url }}">
+  <meta property="og:image:type" content="image/png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="{{ meta.title }}">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="{{ meta.title }}">
+  <meta name="twitter:description" content="{{ meta.description }}">
+  <meta name="twitter:image" content="{{ meta.og_image_url }}">
+  <meta name="twitter:image:alt" content="{{ meta.title }}">
+  {% for ld in meta.jsonld %}
+  <script type="application/ld+json">{{ ld|tojson }}</script>
+  {% endfor %}
+  <script type="module" src="{{ static('js/app.js') }}"></script>
+  {% if settings.yandex_metrika_id %}<script src="{{ static('js/metrika.js') }}" data-id="{{ settings.yandex_metrika_id }}" data-host="{{ settings.site_host }}" defer></script>{% endif %}
+  {% if settings.hits_counter %}<script src="{{ static('js/counter.js') }}" defer></script>{% endif %}
+  {% block head %}{% endblock %}
+</head>
+<body class="{% block body_class %}{% endblock %}" data-icons="{{ static('img/icons.svg') }}">
+  <a class="skip-link" href="#main">Перейти к содержанию</a>
+  {% include "partials/header.html" %}
+  <main id="main">
+    {% block main %}{% endblock %}
+  </main>
+  {% include "partials/footer.html" %}
+  {% include "partials/overlays.html" %}
+  {% block scripts %}{% endblock %}
+</body>
+</html>

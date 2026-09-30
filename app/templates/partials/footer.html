@@ -1,0 +1,36 @@
+{% from "partials/ui.html" import logo_mark %}
+<footer class="site-footer">
+  <div class="signal-bars" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div>
+  <div class="container footer-grid">
+    <div class="footer-brand">
+      <a class="logo" href="/">{{ logo_mark() }}<span class="logo-text">YouTube Комбайн</span></a>
+      <p>Бесплатные инструменты для работы с YouTube: без регистрации, ключей API и хранения ваших данных.</p>
+    </div>
+    {% for cat in categories %}
+    <div class="footer-col">
+      <p class="footer-title"><a href="/category/{{ cat.slug }}">{{ cat.name }}</a></p>
+      <ul>
+        {% for t in tools_in(cat.slug) %}<li><a href="{{ t.path }}">{{ t.name }}</a></li>{% endfor %}
+      </ul>
+    </div>
+    {% endfor %}
+    <div class="footer-col">
+      <p class="footer-title">Комбайн</p>
+      <ul>
+        <li><a href="/tools">Все инструменты</a></li>
+        <li><a href="/faq">Вопросы и ответы</a></li>
+        <li><a href="/privacy">Конфиденциальность</a></li>
+      </ul>
+      <p class="footer-title footer-title-gap">Другие проекты</p>
+      <ul>
+        <li><a href="https://rastr.onrender.com/" rel="noopener" title="Конвертер и сжатие изображений в браузере">Растр — конвертер фото</a></li>
+        <li><a href="https://seotoolkitru.onrender.com/" rel="noopener" title="Бесплатные SEO-инструменты">SEO Toolkit — SEO-инструменты</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="container footer-bottom">
+    <p>© {{ year }} YouTube Комбайн. Независимый сервис, не связан с YouTube и Google LLC. YouTube — товарный знак Google LLC.</p>
+    <p>Скачивайте только тот контент, на который у вас есть права.</p>
+    {% if settings.hits_counter %}<span class="counter" id="counter" hidden data-host="{{ settings.site_host }}" data-src="https://hits.sh/{{ settings.site_host }}.svg?view=today-total&amp;label=%D0%9F%D0%BE%D1%81%D0%B5%D1%89%D0%B5%D0%BD%D0%B8%D0%B9&amp;style=flat-square&amp;color=4f5cf0&amp;labelColor=24252c"></span>{% endif %}
+  </div>
+</footer>

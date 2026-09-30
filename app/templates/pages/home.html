@@ -1,0 +1,152 @@
+{% extends "base.html" %}
+{% from "partials/ui.html" import icon, tool_clip, faq_list %}
+{% block body_class %}page-home{% endblock %}
+{% block main %}
+<section class="hero">
+  <div class="container hero-grid">
+    <div class="hero-copy">
+      <h1 class="hero-title">YouTube <br>Комбайн<span class="hero-title-sub"> — бесплатные инструменты для YouTube</span></h1>
+      <p class="hero-sub">Вставьте ссылку на видео, плейлист или канал — Комбайн подскажет, что с ней можно сделать:
+        скачать файл, достать субтитры, провести розыгрыш, забрать превью.</p>
+
+      <form class="detector" id="detector" novalidate>
+        <label class="detector-label" for="detector-input">Что вы хотите сделать с YouTube?</label>
+        <div class="url-row">
+          <div class="url-field url-field-xl">
+            {{ icon('link', 'url-field-icon') }}
+            <input id="detector-input" name="url" type="text" inputmode="url" autocomplete="off" autocapitalize="off"
+                   spellcheck="false" enterkeyhint="go" maxlength="2048"
+                   placeholder="youtube.com/watch?v=… или youtu.be/…">
+            <button type="button" class="paste-btn" data-paste title="Вставить из буфера обмена">{{ icon('paste') }}<span>Вставить</span></button>
+          </div>
+          <button class="btn btn-primary btn-lg" type="submit">Разобрать ссылку</button>
+        </div>
+        <p class="field-hint" data-hint aria-live="polite"></p>
+      </form>
+
+      <div class="detect-result" id="detect-result" hidden>
+        <div class="detect-card">
+          <div class="detect-thumb" data-thumb hidden></div>
+          <div class="detect-info">
+            <span class="detect-kind" data-kind></span>
+            <p class="detect-title" data-title></p>
+            <p class="detect-meta" data-meta></p>
+          </div>
+        </div>
+        <p class="detect-lead" data-lead></p>
+        <ul class="detect-actions">
+          {% for t in tools %}
+          <li data-accepts="{{ t.accepts|join(' ') }}" data-slug="{{ t.slug }}" hidden>
+            <a class="action" data-tool-link href="{{ t.path }}" style="--track: var(--c-{{ t.category }})">
+              {{ icon(t.icon) }}<span>{{ t.name }}</span>
+            </a>
+          </li>
+          {% endfor %}
+        </ul>
+        <button class="btn btn-ghost btn-sm detect-more" type="button" data-more hidden></button>
+      </div>
+
+      <div class="quick" id="quick">
+        <span class="quick-label">Чаще всего:</span>
+        <a href="/youtube-downloader">Скачать видео</a>
+        <a href="/youtube-audio-downloader">Звук в MP3</a>
+        <a href="/youtube-shorts-maker">Сделать Shorts</a>
+        <a href="/youtube-transcript">Субтитры</a>
+        <a href="/youtube-thumbnail">Превью</a>
+        <a href="/youtube-comment-picker">Розыгрыш</a>
+      </div>
+    </div>
+
+    {% set offsets = [0, 7, 3, 12, 5] %}
+    <div class="timeline" id="timeline" role="group" aria-label="Инструменты по дорожкам">
+      <div class="tl-top" aria-hidden="true">
+        <span class="tl-tc" data-timecode>00:00:00:00</span>
+        <span class="tl-title">Любая ссылка YouTube</span>
+      </div>
+      <div class="tl-ruler" aria-hidden="true">
+        {% for i in range(7) %}<span>{{ '%02d:%02d' % ((i * 10) // 60, (i * 10) % 60) }}</span>{% endfor %}
+      </div>
+      <div class="tl-tracks">
+        {% for cat in categories %}
+        <div class="tl-track" style="--track: var(--c-{{ cat.slug }})">
+          <a class="tl-head" href="/category/{{ cat.slug }}"><span class="swatch" aria-hidden="true"></span>{{ cat.name }}</a>
+          <div class="tl-lane" style="--offset: {{ offsets[loop.index0] }}%">
+            {% for t in tools_in(cat.slug) %}
+            <a class="tl-clip" href="{{ t.path }}" data-accepts="{{ t.accepts|join(' ') }}" style="--grow: {{ t.name|length }}">
+              <span>{{ t.extra.get('short', t.name) }}</span>
+            </a>
+            {% endfor %}
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+      <div class="tl-playhead" aria-hidden="true"></div>
+    </div>
+  </div>
+</section>
+
+<section class="section lanes" id="tools" aria-labelledby="lanes-title">
+  <div class="container">
+    <div class="section-head">
+      <h2 id="lanes-title">{{ tools|length }} инструментов, разложенных по дорожкам</h2>
+      <p>Как на монтажном столе: у каждой задачи своя дорожка и свой цвет. Цвет помогает не потеряться, когда переходите между инструментами.</p>
+    </div>
+    {% for cat in categories %}
+    <div class="lane" style="--track: var(--c-{{ cat.slug }})">
+      <div class="lane-head">
+        <h3><a href="/category/{{ cat.slug }}">{{ cat.name }}</a></h3>
+        <p>{{ cat.short }}</p>
+      </div>
+      <div class="lane-clips">
+        {% for t in tools_in(cat.slug) %}{{ tool_clip(t) }}{% endfor %}
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+</section>
+
+<section class="section steps-section" aria-labelledby="steps-title">
+  <div class="container">
+    <div class="section-head">
+      <h2 id="steps-title">Как это работает</h2>
+    </div>
+    <ol class="steps">
+      <li>
+        <h3>Скопируйте ссылку</h3>
+        <p>В приложении YouTube — «Поделиться» → «Копировать ссылку». Подойдёт видео, Shorts, плейлист или канал.</p>
+      </li>
+      <li>
+        <h3>Вставьте её в Комбайн</h3>
+        <p>Он сам поймёт, что это за ссылка, и предложит подходящие инструменты. На телефоне хватит кнопки «Вставить».</p>
+      </li>
+      <li>
+        <h3>Заберите результат</h3>
+        <p>Файл, текст, таблицу или готовую ссылку. Ничего не нужно устанавливать, и регистрироваться тоже не нужно.</p>
+      </li>
+    </ol>
+  </div>
+</section>
+
+<section class="section" aria-labelledby="principles-title">
+  <div class="container principles">
+    <h2 id="principles-title">Что важно знать</h2>
+    <ul class="principles-list">
+      <li>{{ icon('check') }}<div><strong>Без аккаунтов и ключей</strong><p>Комбайн работает с открытыми страницами YouTube. Входить в Google не нужно.</p></div></li>
+      <li>{{ icon('check') }}<div><strong>Ничего не храним</strong><p>Файлы удаляются сразу после скачивания, ссылки не записываются в базу.</p></div></li>
+      <li>{{ icon('check') }}<div><strong>Работает в браузере</strong><p>Таймкоды, встраивание и фильтры комментариев считаются прямо на вашем устройстве.</p></div></li>
+      <li>{{ icon('check') }}<div><strong>Честные ограничения</strong><p>Приватные видео, эфиры и ролики 18+ обработать нельзя — Комбайн скажет об этом прямо.</p></div></li>
+    </ul>
+  </div>
+</section>
+
+<section class="section" aria-labelledby="faq-title">
+  <div class="container narrow">
+    <div class="section-head">
+      <h2 id="faq-title">Частые вопросы</h2>
+    </div>
+    {{ faq_list(faq) }}
+    <p class="more-link"><a href="/faq">Все вопросы и ответы</a></p>
+  </div>
+</section>
+{% endblock %}
+{% block scripts %}<script type="module" src="{{ static('js/home.js') }}"></script>{% endblock %}

@@ -1,0 +1,37 @@
+# Настройки Render (Blueprint): New → Blueprint → репозиторий OlegChe77/ytkombain.
+# Render читает файл при создании сервиса и при каждом деплое. Документация: https://render.com/docs/blueprint-spec
+services:
+  - name: ytkombain            # адрес сайта: https://ytkombain.onrender.com (сменить после создания нельзя)
+    type: web
+    runtime: docker
+    plan: free                 # засыпает после 15 минут без посетителей; для скорости — starter
+    region: frankfurt
+    branch: main
+    autoDeployTrigger: commit
+    dockerfilePath: ./Dockerfile
+    healthCheckPath: /api/health
+    envVars:
+      - key: SITE_URL
+        value: https://ytkombain.onrender.com
+      - key: APP_ENV
+        value: production
+      - key: TRUST_PROXY
+        value: "true"
+      - key: HITS_COUNTER
+        value: "true"
+      # Номер счётчика Яндекс Метрики и коды подтверждения вебмастеров (значение content из метатега)
+      - key: YANDEX_METRIKA_ID
+        value: "113219277"
+      - key: YANDEX_VERIFICATION
+        value: 841bbc09c9856faa
+      - key: GOOGLE_VERIFICATION
+        value: rxm1KmsK1Xx9RQs7D-i8IKrDVR_BwP26BMabnQyyerc
+      # На бесплатном тарифе мало памяти и процессора — держим нагрузку скромной
+      - key: JOB_WORKERS
+        value: "2"
+      - key: DOWNLOAD_WORKERS
+        value: "1"
+      - key: MAX_FILESIZE_MB
+        value: "500"
+      - key: EDITOR_MAX_SESSIONS
+        value: "6"

@@ -1,0 +1,83 @@
+{% extends "tools/_layout.html" %}
+{% from "partials/ui.html" import icon %}
+{% from "partials/comments.html" import switch %}
+{% block workspace %}
+<form class="embed" id="embed-form" novalidate>
+  <div class="panel embed-settings">
+    <label class="text-field text-field-wide">
+      <span>Ссылка на видео или плейлист</span>
+      <span class="url-field">
+        {{ icon('link', 'url-field-icon') }}
+        <input type="text" name="url" id="embed-url" inputmode="url" autocomplete="off" spellcheck="false" placeholder="youtube.com/watch?v=…" maxlength="2048">
+        <button type="button" class="paste-btn" data-paste title="Вставить из буфера обмена">{{ icon('paste') }}<span>Вставить</span></button>
+      </span>
+    </label>
+    <p class="field-hint" id="embed-hint" aria-live="polite"></p>
+
+    <fieldset class="fieldset">
+      <legend>Размер</legend>
+      {{ switch('responsive', 'Адаптивная ширина (16:9)', true) }}
+      <div class="field-pair" id="embed-size">
+        <label class="text-field"><span>Ширина, px</span><input type="number" name="width" value="560" min="200" max="3840" inputmode="numeric"></label>
+        <label class="text-field"><span>Высота, px</span><input type="number" name="height" value="315" min="113" max="2160" inputmode="numeric"></label>
+      </div>
+    </fieldset>
+
+    <fieldset class="fieldset">
+      <legend>Воспроизведение</legend>
+      <div class="field-pair">
+        <label class="text-field"><span>Начать с</span><input type="text" name="start" placeholder="0:00" inputmode="numeric" autocomplete="off"></label>
+        <label class="text-field"><span>Закончить на</span><input type="text" name="end" placeholder="до конца" inputmode="numeric" autocomplete="off"></label>
+      </div>
+      <div class="switches">
+        {{ switch('autoplay', 'Автозапуск (без звука)') }}
+        {{ switch('loop', 'Повтор') }}
+        {{ switch('controls', 'Элементы управления', true) }}
+        {{ switch('cc', 'Сразу включить субтитры') }}
+        {{ switch('rel', 'Рекомендации только с этого канала', true) }}
+        {{ switch('fs', 'Кнопка полноэкранного режима', true) }}
+        {{ switch('nocookie', 'Режим без cookies', true) }}
+        {{ switch('lazy', 'Ленивая загрузка', true) }}
+      </div>
+    </fieldset>
+  </div>
+
+  <div class="embed-output">
+    <div class="segmented embed-tabs" role="tablist" aria-label="Просмотр">
+      <button type="button" role="tab" aria-selected="true" aria-controls="embed-preview-pane" id="embed-tab-preview">Превью</button>
+      <button type="button" role="tab" aria-selected="false" aria-controls="embed-code-pane" id="embed-tab-code">Код</button>
+    </div>
+    <div class="panel embed-preview" id="embed-preview-pane" role="tabpanel" aria-labelledby="embed-tab-preview">
+      <p class="h5 pane-title">Превью</p>
+      <div class="embed-stage" id="embed-stage">
+        <div class="empty">{{ icon('video') }}<p>Вставьте ссылку — здесь появится плеер с вашими настройками.</p></div>
+      </div>
+    </div>
+    <div class="panel embed-code" id="embed-code-pane" role="tabpanel" aria-labelledby="embed-tab-code">
+      <div class="pane-title-row">
+        <p class="h5 pane-title">Код для вставки</p>
+        <button class="btn btn-primary btn-sm" type="button" id="embed-copy" disabled>{{ icon('copy') }}Копировать код</button>
+      </div>
+      <pre class="code" id="embed-code"><code>Код появится после того, как вы вставите ссылку.</code></pre>
+    </div>
+  </div>
+</form>
+{% endblock %}
+
+{% block guide %}
+<h2>Как встроить видео YouTube на сайт</h2>
+<ol>
+  <li>Вставьте ссылку на ролик или плейлист.</li>
+  <li>Настройте размер и поведение плеера — превью обновляется сразу.</li>
+  <li>Скопируйте код и вставьте его в HTML страницы или блок «HTML-код» вашего конструктора.</li>
+</ol>
+<h2>Что означают настройки</h2>
+<h3>Адаптивная ширина</h3>
+<p>Плеер растягивается на всю ширину блока и сохраняет пропорции 16:9 — на телефоне и компьютере. Для этого используется CSS-свойство aspect-ratio, которое понимают все современные браузеры.</p>
+<h3>Режим без cookies</h3>
+<p>Плеер грузится с youtube-nocookie.com и не ставит cookies, пока посетитель не запустит видео. Это полезно для сайтов, которые учитывают требования GDPR.</p>
+<h3>Ленивая загрузка</h3>
+<p>Атрибут loading="lazy" откладывает загрузку плеера, пока посетитель не прокрутит до него. Страница открывается быстрее — особенно если на ней несколько видео.</p>
+<h3>Частые проблемы</h3>
+<p>Если вместо видео плеер пишет «Видео недоступно», автор запретил встраивание. Автозапуск со звуком браузеры блокируют — поэтому он всегда включается вместе с mute=1.</p>
+{% endblock %}

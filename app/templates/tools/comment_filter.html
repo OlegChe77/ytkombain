@@ -1,0 +1,50 @@
+{% extends "tools/_layout.html" %}
+{% from "partials/ui.html" import icon, url_form, comments_options %}
+{% from "partials/comments.html" import filters %}
+{% block workspace %}
+{% call url_form('cm-form', 'Ссылка на видео', 'Загрузить комментарии', 'video', autostart=false) %}{{ comments_options(1000, true) }}{% endcall %}
+<div class="result" id="cm-summary" hidden></div>
+<div class="filter-view" id="filter-view" hidden>
+  <div class="panel filter-panel">
+    <p class="h4">Фильтры</p>
+    {{ filters('cf-filters', ['include', 'exclude', 'length', 'max_len', 'unique', 'no_replies', 'no_links'], no_replies_on=false) }}
+    <label class="select-field">
+      <span>Сортировка</span>
+      <select id="cf-sort">
+        <option value="original">Как на YouTube</option>
+        <option value="likes">По лайкам</option>
+        <option value="length">По длине</option>
+        <option value="new">Сначала новые</option>
+      </select>
+    </label>
+  </div>
+  <div class="filter-results">
+    <div class="results-bar">
+      <p id="cf-count" aria-live="polite"></p>
+      <div class="results-actions">
+        <button class="btn btn-secondary btn-sm" type="button" data-export="copy">{{ icon('copy') }}Копировать</button>
+        <button class="btn btn-secondary btn-sm" type="button" data-export="txt">{{ icon('download') }}TXT</button>
+        <button class="btn btn-secondary btn-sm" type="button" data-export="csv">{{ icon('download') }}CSV</button>
+      </div>
+    </div>
+    <div class="comment-list" id="cf-list"></div>
+    <button class="btn btn-secondary btn-block" type="button" id="cf-more" hidden>Показать ещё</button>
+  </div>
+</div>
+{% endblock %}
+
+{% block guide %}
+<h2>Как отфильтровать комментарии</h2>
+<ol>
+  <li>Загрузите комментарии видео. Если нужны ответы в ветках, оставьте включённым «Загружать ответы».</li>
+  <li>Задайте условия — список обновляется сразу, совпадения подсвечиваются.</li>
+  <li>Скопируйте результат или выгрузите его в TXT или CSV.</li>
+</ol>
+<h2>Примеры задач</h2>
+<h3>Найти вопросы зрителей</h3>
+<p>В поле «Содержит слова» введите: <em>как, почему, где, подскажите, ?</em> — и отсортируйте по лайкам. Получится список вопросов, которые волнуют аудиторию больше всего.</p>
+<h3>Убрать спам</h3>
+<p>Включите «Без ссылок» и укажите в «Не содержит» типичные слова спам-ботов. Длина от 15 символов отсечёт короткие эмодзи-реакции.</p>
+<h3>Собрать отзывы для анализа</h3>
+<p>Выгрузите CSV и откройте его в Excel или Google Таблицах: у каждой строки есть автор, лайки, примерная дата и прямая ссылка на комментарий.</p>
+{% endblock %}

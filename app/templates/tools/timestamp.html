@@ -1,0 +1,59 @@
+{% extends "tools/_layout.html" %}
+{% from "partials/ui.html" import icon %}
+{% block workspace %}
+<div class="segmented" role="tablist" aria-label="Режим">
+  <button type="button" role="tab" aria-selected="true" aria-controls="ts-single" id="ts-tab-single">Одна ссылка</button>
+  <button type="button" role="tab" aria-selected="false" aria-controls="ts-chapters" id="ts-tab-chapters">Таймкоды для описания</button>
+</div>
+
+<form class="panel ts-form" id="ts-form" novalidate>
+  <label class="text-field text-field-wide">
+    <span>Ссылка на видео</span>
+    <span class="url-field">
+      {{ icon('link', 'url-field-icon') }}
+      <input type="text" name="url" id="ts-url" inputmode="url" autocomplete="off" spellcheck="false" placeholder="youtube.com/watch?v=… или youtu.be/…" maxlength="2048">
+      <button type="button" class="paste-btn" data-paste title="Вставить из буфера обмена">{{ icon('paste') }}<span>Вставить</span></button>
+    </span>
+  </label>
+
+  <div id="ts-single" role="tabpanel" aria-labelledby="ts-tab-single">
+    <label class="text-field">
+      <span>Время</span>
+      <input type="text" name="time" id="ts-time" inputmode="numeric" autocomplete="off" placeholder="например, 1:25:40" class="input-time">
+    </label>
+    <div class="time-presets" aria-label="Быстрые значения">
+      {% for t in ['0:30', '1:00', '5:00', '10:00', '1:00:00'] %}<button type="button" class="chip" data-time="{{ t }}">{{ t }}</button>{% endfor %}
+    </div>
+    <p class="field-hint" id="ts-hint" aria-live="polite"></p>
+    <div class="link-results" id="ts-results" hidden></div>
+  </div>
+
+  <div id="ts-chapters" role="tabpanel" aria-labelledby="ts-tab-chapters" hidden>
+    <label class="text-field text-field-wide">
+      <span>Главы: время и название, по одной на строку</span>
+      <textarea name="chapters" id="ts-chapter-input" rows="7" spellcheck="false" placeholder="0:00 Вступление&#10;1:45 Распаковка&#10;6:30 Первые впечатления&#10;14:10 Итоги"></textarea>
+    </label>
+    <div class="chapter-check" id="ts-check" aria-live="polite"></div>
+    <div class="chapter-output" id="ts-chapter-output" hidden></div>
+  </div>
+</form>
+{% endblock %}
+
+{% block guide %}
+<h2>Как сделать ссылку на момент видео</h2>
+<ol>
+  <li>Вставьте ссылку на ролик — подойдёт обычная, короткая или Shorts.</li>
+  <li>Введите время в любом привычном виде: 90, 1:30 или 1:25:40.</li>
+  <li>Скопируйте готовую ссылку. Кнопка «Проверить» откроет видео ровно с этой секунды.</li>
+</ol>
+<h2>Таймкоды для описания</h2>
+<p>Если в описании ролика есть список глав, YouTube разбивает шкалу воспроизведения на части и показывает их названия. Чтобы это сработало, нужно соблюсти три правила:</p>
+<ul>
+  <li>первая глава начинается с 0:00;</li>
+  <li>глав не меньше трёх;</li>
+  <li>каждая глава длится не меньше 10 секунд.</li>
+</ul>
+<p>Режим «Таймкоды для описания» проверяет эти правила, упорядочивает строки по времени и приводит время к единому виду — остаётся скопировать текст в описание.</p>
+<h3>Частые ошибки</h3>
+<p>Время больше длительности ролика YouTube проигнорирует и откроет видео с начала. В ссылках на Shorts переход ко времени не работает, поэтому Комбайн формирует обычную ссылку на видео.</p>
+{% endblock %}

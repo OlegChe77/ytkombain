@@ -1,0 +1,47 @@
+{% extends "tools/_layout.html" %}
+{% from "partials/ui.html" import icon, url_form, comments_options %}
+{% from "partials/comments.html" import filters %}
+{% block workspace %}
+{% call url_form('cm-form', 'Ссылка на видео с розыгрышем', 'Загрузить комментарии', 'video', autostart=false) %}{{ comments_options(1000, false) }}{% endcall %}
+<div class="result" id="cm-summary" hidden></div>
+
+<div class="picker" id="picker" hidden>
+  <div class="picker-setup panel">
+    <div class="pane-title-row">
+      <p class="h4 pane-title">Условия розыгрыша</p>
+      <button class="btn btn-ghost btn-sm" type="button" id="sound-toggle" aria-pressed="true">{{ icon('volume') }}Звук включён</button>
+    </div>
+    <label class="text-field text-field-inline">
+      <span>Победителей</span>
+      <input type="number" name="winners" id="winners" value="1" min="1" max="50" inputmode="numeric">
+    </label>
+    {{ filters('picker-filters', ['include', 'length', 'users', 'unique', 'no_replies', 'no_links', 'no_owner'], 'Один шанс на участника', true) }}
+    <p class="pool" id="pool" aria-live="polite"></p>
+    <button class="btn btn-primary btn-lg btn-block" type="button" id="draw">{{ icon('trophy') }}Выбрать победителей</button>
+  </div>
+  <div class="stage panel" id="stage">
+    <div class="stage-empty" id="stage-empty">
+      {{ icon('trophy') }}
+      <p>Задайте условия и нажмите «Выбрать победителей». Результат можно развернуть на весь экран для трансляции.</p>
+    </div>
+    <div class="reel" id="reel" hidden aria-hidden="true"><div class="reel-strip"></div></div>
+    <div class="winners" id="winners-list" hidden></div>
+  </div>
+</div>
+{% endblock %}
+
+{% block guide %}
+<h2>Как провести розыгрыш</h2>
+<ol>
+  <li>Вставьте ссылку на видео и загрузите комментарии. Для конкурсов обычно выбирают «Сначала новые» и лимит больше числа комментариев под роликом.</li>
+  <li>Задайте условия: сколько победителей, какое слово должно быть в комментарии, кого исключить.</li>
+  <li>Нажмите «Выбрать победителей» — барабан прокрутит участников со звуком, а победителя встретят фанфары и фейерверк. Звук можно выключить кнопкой в условиях. Каждого победителя можно перевыбрать отдельно, если он не выполнил условия.</li>
+  <li>Разверните результат на весь экран или скопируйте список победителей со ссылками на их комментарии.</li>
+</ol>
+<h2>Как сделать розыгрыш честным</h2>
+<p>Опишите условия заранее — в самом видео или закреплённом комментарии — и используйте те же фильтры в Комбайне. Включите «Один шанс на участника», чтобы десять комментариев от одного человека не давали ему десятикратного преимущества. Исключите автора канала и модераторов.</p>
+<h3>Что попадёт в розыгрыш</h3>
+<p>Только видимые комментарии. YouTube не показывает никому, кроме автора, комментарии, которые ждут проверки или попали в спам. Если участник уверен, что писал, попросите его проверить, не удалён ли комментарий.</p>
+<h3>Частые ошибки</h3>
+<p>Загрузили «Сначала популярные» с маленьким лимитом — и в розыгрыш попала только часть участников. Сводка над условиями показывает, сколько комментариев загружено из общего числа.</p>
+{% endblock %}

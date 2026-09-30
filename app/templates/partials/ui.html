@@ -1,0 +1,84 @@
+{% macro icon(name, cls='') -%}
+<svg class="icon {{ cls }}" aria-hidden="true" focusable="false"><use href="{{ static('img/icons.svg') }}#i-{{ name }}"></use></svg>
+{%- endmacro %}
+
+{% macro logo_mark(cls='') -%}
+<svg class="logo-mark {{ cls }}" viewBox="0 0 32 32" aria-hidden="true" focusable="false">
+  <rect x="4" y="5" width="3.6" height="22" rx="1.2" fill="var(--c-video)"/>
+  <rect x="9.3" y="7.2" width="3.6" height="17.6" rx="1.2" fill="var(--c-comments)"/>
+  <rect x="14.6" y="9.4" width="3.6" height="13.2" rx="1.2" fill="var(--c-images)"/>
+  <rect x="19.9" y="11.6" width="3.6" height="8.8" rx="1.2" fill="var(--c-links)"/>
+  <rect x="25.2" y="13.8" width="3.6" height="4.4" rx="1.2" fill="var(--c-playlists)"/>
+</svg>
+{%- endmacro %}
+
+{% macro breadcrumbs(crumbs) -%}
+<nav class="crumbs" aria-label="Хлебные крошки">
+  <ol>
+    {% for name, path in crumbs %}
+    <li>{% if loop.last %}<span aria-current="page">{{ name }}</span>{% else %}<a href="{{ path }}">{{ name }}</a>{% endif %}</li>
+    {% endfor %}
+  </ol>
+</nav>
+{%- endmacro %}
+
+{% macro tool_clip(tool, compact=false) -%}
+<a class="clip{% if compact %} clip-compact{% endif %}" href="{{ tool.path }}" data-accepts="{{ tool.accepts|join(' ') }}" style="--track: var(--c-{{ tool.category }})">
+  <span class="clip-icon">{{ icon(tool.icon) }}</span>
+  <span class="clip-body">
+    <span class="clip-name">{{ tool.name }}</span>
+    {% if not compact %}<span class="clip-text">{{ tool.blurb }}</span>{% endif %}
+  </span>
+</a>
+{%- endmacro %}
+
+{% macro faq_list(items) -%}
+<div class="faq-list">
+  {% for q, a in items %}
+  <details class="faq-item">
+    <summary><span>{{ q }}</span>{{ icon('chevron-down', 'faq-chevron') }}</summary>
+    <p>{{ a }}</p>
+  </details>
+  {% endfor %}
+</div>
+{%- endmacro %}
+
+{% macro url_form(id, placeholder, button, accepts='video', autostart=true) -%}
+<form class="url-form" id="{{ id }}" data-accepts="{{ accepts }}" data-autostart="{{ 'true' if autostart else 'false' }}" novalidate>
+  <label class="sr-only" for="{{ id }}-input">Ссылка на YouTube</label>
+  <div class="url-row">
+    <div class="url-field">
+      {{ icon('link', 'url-field-icon') }}
+      <input id="{{ id }}-input" name="url" type="text" inputmode="url" autocomplete="off" autocapitalize="off"
+             spellcheck="false" enterkeyhint="go" placeholder="{{ placeholder }}" maxlength="2048">
+      <button type="button" class="paste-btn" data-paste title="Вставить из буфера обмена">{{ icon('paste') }}<span>Вставить</span></button>
+    </div>
+    <button class="btn btn-primary btn-lg url-submit" type="submit">{{ button }}</button>
+  </div>
+  {% if caller is defined %}<div class="url-options">{{ caller() }}</div>{% endif %}
+  <p class="field-hint" data-hint aria-live="polite"></p>
+</form>
+{%- endmacro %}
+
+{% macro comments_options(default_limit=1000, replies=false) -%}
+<label class="select-field">
+  <span>Сколько загрузить</span>
+  <select name="limit">
+    {% for n in [200, 500, 1000, 2000, 5000] if n <= settings.max_comments %}
+    <option value="{{ n }}"{% if n == default_limit %} selected{% endif %}>до {{ '{:,}'.format(n).replace(',', ' ') }}</option>
+    {% endfor %}
+  </select>
+</label>
+<label class="select-field">
+  <span>Порядок</span>
+  <select name="sort">
+    <option value="top">Сначала популярные</option>
+    <option value="new">Сначала новые</option>
+  </select>
+</label>
+<label class="switch">
+  <input type="checkbox" name="replies"{% if replies %} checked{% endif %}>
+  <span class="switch-track" aria-hidden="true"></span>
+  <span>Загружать ответы</span>
+</label>
+{%- endmacro %}

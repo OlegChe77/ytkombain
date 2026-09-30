@@ -1,0 +1,52 @@
+{% from "partials/ui.html" import icon, logo_mark %}
+<nav class="tabbar" aria-label="Быстрые действия">
+  <a class="tab" href="/"{% if meta.path == '/' %} aria-current="page"{% endif %}>{{ icon('home') }}<span>Главная</span></a>
+  <button class="tab tab-main" type="button" data-paste-link>{{ icon('paste') }}<span>Вставить ссылку</span></button>
+  <button class="tab" type="button" data-open-drawer>{{ icon('grid') }}<span>Инструменты</span></button>
+</nav>
+
+<dialog class="drawer" id="drawer" aria-label="Меню">
+  <div class="drawer-head">
+    <a class="logo" href="/">{{ logo_mark() }}<span class="logo-text">Комбайн</span></a>
+    <button class="icon-btn" type="button" data-close aria-label="Закрыть меню">{{ icon('x') }}</button>
+  </div>
+  <div class="drawer-body">
+    {% for cat in categories %}
+    <details class="drawer-group" style="--track: var(--c-{{ cat.slug }})"{% if loop.first %} open{% endif %}>
+      <summary><span class="swatch" aria-hidden="true"></span>{{ cat.name }}<small>{{ tools_in(cat.slug)|length }}</small>{{ icon('chevron-down', 'drawer-chevron') }}</summary>
+      <ul>
+        <li><a href="/category/{{ cat.slug }}">Вся категория</a></li>
+        {% for t in tools_in(cat.slug) %}<li><a href="{{ t.path }}">{{ icon(t.icon) }}{{ t.name }}</a></li>{% endfor %}
+      </ul>
+    </details>
+    {% endfor %}
+    <div class="drawer-links">
+      <a href="/tools">Все инструменты</a>
+      <a href="/faq">Вопросы и ответы</a>
+      <a href="/privacy">Конфиденциальность</a>
+    </div>
+    <button class="btn btn-secondary drawer-theme" type="button" data-theme-toggle>
+      {{ icon('sun', 'theme-icon-light') }}{{ icon('moon', 'theme-icon-dark') }}<span data-theme-label>Светлая тема</span>
+    </button>
+  </div>
+</dialog>
+
+<dialog class="palette" id="palette" aria-label="Поиск инструментов">
+  <div class="palette-box">
+    <div class="palette-input">
+      {{ icon('search') }}
+      <input type="text" id="palette-input" placeholder="Задача, инструмент или ссылка на YouTube" autocomplete="off"
+             spellcheck="false" role="combobox" aria-expanded="true" aria-controls="palette-list" aria-autocomplete="list">
+      <button class="paste-btn" type="button" data-palette-paste title="Вставить из буфера обмена">{{ icon('paste') }}<span>Вставить</span></button>
+    </div>
+    <div class="palette-context" id="palette-context" hidden></div>
+    <ul class="palette-list" id="palette-list" role="listbox" aria-label="Результаты"></ul>
+    <div class="palette-foot">
+      <span><kbd>↑</kbd><kbd>↓</kbd> выбрать</span>
+      <span><kbd>Enter</kbd> открыть</span>
+      <span><kbd>Esc</kbd> закрыть</span>
+    </div>
+  </div>
+</dialog>
+
+<div class="toasts" id="toasts" role="status" aria-live="polite"></div>

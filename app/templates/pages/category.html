@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% from "partials/ui.html" import icon, tool_clip, breadcrumbs, faq_list %}
+{% block body_class %}page-category{% endblock %}
+{% block main %}
+<div class="category-page" style="--track: var(--c-{{ category.slug }})">
+  <div class="container page-head">
+    {{ breadcrumbs(meta.breadcrumbs) }}
+    <h1><span class="swatch swatch-lg" aria-hidden="true"></span>{{ category.h1 or category.name }}</h1>
+    <p class="lead">{{ category.intro }}</p>
+  </div>
+  <div class="container">
+    <div class="catalog-grid">
+      {% for t in items %}{{ tool_clip(t) }}{% endfor %}
+    </div>
+  </div>
+  {% if category.body or category.faq %}
+  <div class="container section" style="padding-bottom: 0">
+    <article class="prose">
+      {% for heading, text in category.body %}
+      <h2>{{ heading }}</h2>
+      <p>{{ text }}</p>
+      {% endfor %}
+      {% if category.faq %}
+      <section class="faq" aria-labelledby="faq-title">
+        <h2 id="faq-title">Частые вопросы</h2>
+        {{ faq_list(category.faq) }}
+      </section>
+      {% endif %}
+    </article>
+  </div>
+  {% endif %}
+  <section class="container section" aria-labelledby="other-title">
+    <h2 id="other-title" class="h3">Другие категории</h2>
+    <ul class="category-links">
+      {% for cat in categories if cat.slug != category.slug %}
+      <li style="--track: var(--c-{{ cat.slug }})"><a href="/category/{{ cat.slug }}"><span class="swatch" aria-hidden="true"></span><span><strong>{{ cat.name }}</strong><small>{{ cat.short }}</small></span></a></li>
+      {% endfor %}
+    </ul>
+  </section>
+</div>
+{% endblock %}

@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% from "partials/ui.html" import icon %}
+{% block body_class %}page-error{% endblock %}
+{% block main %}
+<div class="container narrow error-page">
+  <p class="error-code" aria-hidden="true">{{ code }}</p>
+  <h1>{{ heading }}</h1>
+  <p class="lead">{{ text }}</p>
+  <div class="error-actions">
+    <a class="btn btn-primary" href="/">На главную</a>
+    <a class="btn btn-secondary" href="/tools">Все инструменты</a>
+  </div>
+</div>
+{% endblock %}

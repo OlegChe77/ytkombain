@@ -1,0 +1,95 @@
+/* Дизайн-токены YouTube Комбайна.
+   Идея: монтажный стол. Нейтральный графит монтажной программы + пять «дорожек»,
+   окрашенных цветами телевизионной настроечной таблицы. Каждая категория — своя дорожка. */
+
+:root {
+  --font: "Geologica", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+  --mono: ui-monospace, "SF Mono", "Cascadia Mono", Consolas, "Liberation Mono", monospace;
+
+  --fs-xs: .78rem;
+  --fs-sm: .875rem;
+  --fs-base: 1rem;
+  --fs-md: 1.125rem;
+  --fs-lg: 1.35rem;
+  --fs-xl: clamp(1.55rem, 1.2rem + 1.3vw, 2.05rem);
+  --fs-2xl: clamp(1.95rem, 1.35rem + 2.5vw, 3rem);
+  --fs-hero: clamp(3.2rem, 1.4rem + 7vw, 7.4rem);
+
+  --r-xs: 5px;
+  --r-sm: 9px;
+  --r-md: 13px;
+  --r-lg: 20px;
+  --r-pill: 999px;
+
+  --ease: cubic-bezier(.2, .7, .2, 1);
+  --ease-out: cubic-bezier(.16, 1, .3, 1);
+  --dur: .18s;
+
+  --container: 1200px;
+  --gutter: clamp(16px, 4vw, 32px);
+  --header-h: 64px;
+  --tabbar-h: 0px;
+
+  color-scheme: dark;
+  --bg: #1b1c21;
+  --bg-2: #202128;
+  --well: #151619;
+  --panel: #24252c;
+  --panel-2: #2b2d35;
+  --hover: #31333c;
+  --line: #34363f;
+  --line-2: #474a54;
+  --text: #eeeef0;
+  --text-2: #b1b4be;
+  --text-3: #858995;
+  --inverse-bg: #eeeef0;
+  --inverse-fg: #1b1c21;
+
+  --c-video: #7482ff;
+  --c-comments: #e46fd5;
+  --c-images: #f1c84b;
+  --c-links: #43c9e3;
+  --c-playlists: #4fcf87;
+
+  --ok: #4fcf87;
+  --warn: #f1c84b;
+  --danger: #ff7a70;
+  --focus: #a4b1ff;
+
+  --shadow-1: 0 18px 40px -26px rgba(0, 0, 0, .8);
+  --shadow-pop: 0 30px 70px -24px rgba(0, 0, 0, .8);
+  --scrim: rgba(10, 11, 14, .66);
+  --track: var(--c-video);
+}
+
+[data-theme="light"] {
+  color-scheme: light;
+  --bg: #f3f4f6;
+  --bg-2: #eceef1;
+  --well: #e7e9ed;
+  --panel: #ffffff;
+  --panel-2: #f7f8fa;
+  --hover: #eef0f3;
+  --line: #dde0e6;
+  --line-2: #c6cbd3;
+  --text: #17181c;
+  --text-2: #4a4f5a;
+  --text-3: #6f7581;
+  --inverse-bg: #17181c;
+  --inverse-fg: #ffffff;
+
+  --c-video: #4f5cf0;
+  --c-comments: #b43ba4;
+  --c-images: #a87c00;
+  --c-links: #0a84a3;
+  --c-playlists: #1b8c4f;
+
+  --ok: #1b8a4d;
+  --warn: #946500;
+  --danger: #cc382f;
+  --focus: #4f5cf0;
+
+  --shadow-1: 0 1px 2px rgba(23, 24, 28, .05), 0 12px 30px -18px rgba(23, 24, 28, .25);
+  --shadow-pop: 0 28px 70px -28px rgba(23, 24, 28, .4);
+  --scrim: rgba(23, 24, 28, .38);
+}

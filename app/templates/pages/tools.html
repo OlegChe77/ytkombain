@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% from "partials/ui.html" import icon, tool_clip, breadcrumbs %}
+{% block body_class %}page-catalog{% endblock %}
+{% block main %}
+<div class="container page-head">
+  {{ breadcrumbs(meta.breadcrumbs) }}
+  <h1>Все инструменты</h1>
+  <p class="lead">{{ tools|length }} инструментов для видео, комментариев, картинок, ссылок и плейлистов. Начните вводить задачу — список сузится.</p>
+  <div class="catalog-filter">
+    <label class="url-field" for="catalog-search">
+      {{ icon('search', 'url-field-icon') }}
+      <input id="catalog-search" type="search" placeholder="Например: субтитры, mp3, розыгрыш" autocomplete="off" data-catalog-search>
+    </label>
+    <div class="chips" role="group" aria-label="Категории">
+      <button type="button" class="chip is-active" data-catalog-cat="">Все</button>
+      {% for cat in categories %}
+      <button type="button" class="chip" data-catalog-cat="{{ cat.slug }}" style="--track: var(--c-{{ cat.slug }})"><span class="swatch" aria-hidden="true"></span>{{ cat.name }}</button>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+<div class="container">
+  <div class="catalog-grid" data-catalog>
+    {% for t in tools %}
+    <div class="catalog-item" data-cat="{{ t.category }}" data-search="{{ (t.name ~ ' ' ~ t.h1 ~ ' ' ~ t.blurb ~ ' ' ~ t.keywords|join(' '))|lower }}">
+      {{ tool_clip(t) }}
+    </div>
+    {% endfor %}
+  </div>
+  <div class="empty" data-catalog-empty hidden>
+    {{ icon('search') }}
+    <p><strong>Ничего не нашлось.</strong> Попробуйте другое слово — например, «скачать» или «комментарии».</p>
+  </div>
+</div>
+{% endblock %}
+{% block scripts %}<script type="module" src="{{ static('js/catalog.js') }}"></script>{% endblock %}
