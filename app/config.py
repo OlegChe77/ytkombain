@@ -54,6 +54,19 @@ def _detect_ffmpeg() -> str | None:
         return None
 
 
+def _parse_extractor_args(raw: str) -> dict:
+    """«youtube:player_client=tv,mweb;formats=missing_pot» → {"youtube": {"player_client": ["tv", "mweb"], ...}}.
+    Несколько экстракторов разделяются « | »."""
+    result: dict[str, dict] = {}
+    for chunk in filter(None, (part.strip() for part in raw.split("|"))):
+        name, _, params = chunk.partition(":")
+        target = result.setdefault(name.strip().lower(), {})
+        for pair in filter(None, (p.strip() for p in params.split(";"))):
+            key, _, value = pair.partition("=")
+            target[key.strip()] = [v.strip() for v in value.split(",") if v.strip()]
+    return result
+
+
 def _detect_js_runtimes() -> dict[str, dict]:
     """yt-dlp нужен JS-движок для полноценной работы с YouTube. Ищем deno, node или bun."""
     configured = os.getenv("YTDLP_JS_RUNTIMES", "").strip()
@@ -82,6 +95,7 @@ class Settings:
     js_runtimes: dict
     cookies_file: str | None
     proxy: str | None
+    extractor_args: dict
 
     max_filesize_mb: int
     max_download_duration_min: int
@@ -145,6 +159,7 @@ def load_settings() -> Settings:
         js_runtimes=_detect_js_runtimes(),
         cookies_file=os.getenv("YTDLP_COOKIES_FILE") or None,
         proxy=os.getenv("YTDLP_PROXY") or None,
+        extractor_args=_parse_extractor_args(os.getenv("YTDLP_EXTRACTOR_ARGS", "")),
         max_filesize_mb=_int("MAX_FILESIZE_MB", 1024),
         max_download_duration_min=_int("MAX_DOWNLOAD_DURATION_MIN", 240),
         download_timeout_s=_int("DOWNLOAD_TIMEOUT_S", 900),

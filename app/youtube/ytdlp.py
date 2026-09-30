@@ -61,6 +61,12 @@ def base_options(logger: YdlLogger | None = None, **extra: Any) -> dict:
         opts["cookiefile"] = settings.cookies_file
     if settings.proxy:
         opts["proxy"] = settings.proxy
+    # Параметры экстракторов из настроек (YTDLP_EXTRACTOR_ARGS) объединяем с параметрами конкретного запроса.
+    merged = {name: dict(values) for name, values in settings.extractor_args.items()}
+    for name, values in (extra.pop("extractor_args", None) or {}).items():
+        merged.setdefault(name, {}).update(values)
+    if merged:
+        opts["extractor_args"] = merged
     opts.update(extra)
     return opts
 

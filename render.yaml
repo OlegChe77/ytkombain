@@ -26,6 +26,9 @@ services:
         value: 841bbc09c9856faa
       - key: GOOGLE_VERIFICATION
         value: rxm1KmsK1Xx9RQs7D-i8IKrDVR_BwP26BMabnQyyerc
+      # Клиенты YouTube для yt-dlp: с IP дата-центров обычный web-клиент часто упирается в проверку «не бот»
+      - key: YTDLP_EXTRACTOR_ARGS
+        value: "youtube:player_client=android_vr,tv_simply,web_embedded,visionos"
       # На бесплатном тарифе мало памяти и процессора — держим нагрузку скромной
       - key: JOB_WORKERS
         value: "2"
