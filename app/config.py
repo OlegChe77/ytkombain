@@ -96,6 +96,8 @@ class Settings:
     cookies_file: str | None
     proxy: str | None
     extractor_args: dict
+    pot_server_dir: Path | None
+    pot_max_heap_mb: int
 
     max_filesize_mb: int
     max_download_duration_min: int
@@ -160,6 +162,8 @@ def load_settings() -> Settings:
         cookies_file=os.getenv("YTDLP_COOKIES_FILE") or None,
         proxy=os.getenv("YTDLP_PROXY") or None,
         extractor_args=_parse_extractor_args(os.getenv("YTDLP_EXTRACTOR_ARGS", "")),
+        pot_server_dir=Path(os.environ["POT_SERVER_DIR"]) if os.getenv("POT_SERVER_DIR") else None,
+        pot_max_heap_mb=_int("POT_MAX_HEAP_MB", 160),
         max_filesize_mb=_int("MAX_FILESIZE_MB", 1024),
         max_download_duration_min=_int("MAX_DOWNLOAD_DURATION_MIN", 240),
         download_timeout_s=_int("DOWNLOAD_TIMEOUT_S", 900),

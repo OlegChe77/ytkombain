@@ -1,5 +1,7 @@
 # YouTube Комбайн: Python + yt-dlp + ffmpeg + Deno (JS-движок, который нужен yt-dlp для YouTube)
 FROM denoland/deno:bin AS deno
+# Сервер PO-токенов bgutil: помогает yt-dlp пройти проверку YouTube «вы не бот» с IP дата-центра
+FROM brainicism/bgutil-ytdlp-pot-provider:2.0.0-deno AS pot
 
 FROM python:3.12-slim
 
@@ -11,12 +13,13 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
     TEMP_DIR=/tmp/yt-kombain \
     DENO_DIR=/tmp/yt-kombain/deno \
     XDG_CACHE_HOME=/tmp/yt-kombain/cache \
-    TRUST_PROXY=true
+    TRUST_PROXY=true \n    POT_SERVER_DIR=/opt/pot
 
 RUN apt-get update \
     && apt-get install -y --no-install-recommends ffmpeg ca-certificates \
     && rm -rf /var/lib/apt/lists/*
 COPY --from=deno /deno /usr/local/bin/deno
+COPY --from=pot --chown=10001 /app /opt/pot
 
 WORKDIR /srv/kombain
 COPY requirements.txt .

@@ -22,7 +22,7 @@ from app.core.security import BodyLimitMiddleware, HeadMiddleware, SecurityHeade
 from app.downloads import service as downloads
 from app.editor import service as editor
 from app.web import pages
-from app.youtube import media, video
+from app.youtube import media, pot, video
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s: %(message)s")
 log = logging.getLogger("kombain")
@@ -51,8 +51,10 @@ async def lifespan(_: FastAPI):
         log.warning("ffmpeg не найден: доступны только готовые форматы без склейки и без MP3")
     if not settings.js_runtimes:
         log.warning("JS-движок (deno/node/bun) не найден: часть форматов YouTube может быть недоступна")
+    pot.start()
     task = asyncio.create_task(janitor())
     yield
+    await pot.stop()
     task.cancel()
     with suppress(asyncio.CancelledError):
         await task

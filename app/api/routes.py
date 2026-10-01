@@ -16,7 +16,7 @@ from app.core.ratelimit import limit_api, limit_download, limit_heavy, limit_pol
 from app.downloads import service as downloads
 from app.editor import service as editor
 from app.seo.catalog import search_index
-from app.youtube import channel, comments, media, playlist, subtitles, video, ytdlp
+from app.youtube import channel, comments, media, playlist, pot, subtitles, video, ytdlp
 from app.youtube.urls import parse_youtube_url
 
 router = APIRouter(prefix="/api")
@@ -55,6 +55,7 @@ async def health() -> dict:
         "ffmpeg": settings.ffmpeg_available,
         "js_runtime": ", ".join(settings.js_runtimes) or None,
         "cookies": ytdlp.cookies_enabled(),
+        "pot_server": await pot.status(),
     }
 
 

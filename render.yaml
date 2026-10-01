@@ -26,9 +26,10 @@ services:
         value: 841bbc09c9856faa
       - key: GOOGLE_VERIFICATION
         value: rxm1KmsK1Xx9RQs7D-i8IKrDVR_BwP26BMabnQyyerc
-      # Клиенты YouTube для yt-dlp: с IP дата-центров обычный web-клиент часто упирается в проверку «не бот»
+      # Клиенты YouTube для yt-dlp и PO-токены от сервера bgutil (fetch_pot=always): с IP дата-центров
+      # без токенов YouTube упирается в проверку «не бот»
       - key: YTDLP_EXTRACTOR_ARGS
-        value: "youtube:player_client=android_vr,tv_simply,web_embedded,visionos"
+        value: "youtube:player_client=mweb,web_safari,tv_simply,web_embedded,android_vr;fetch_pot=always"
       # Cookies запасного аккаунта YouTube: Render → сервис ytkombain → Environment → Secret Files → cookies.txt.
       # Пока файла нет, сайт работает без него.
       - key: YTDLP_COOKIES_FILE
