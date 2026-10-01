@@ -54,6 +54,7 @@ async def health() -> dict:
         "yt_dlp": ytdlp.version(),
         "ffmpeg": settings.ffmpeg_available,
         "js_runtime": ", ".join(settings.js_runtimes) or None,
+        "cookies": ytdlp.cookies_enabled(),
     }
 
 

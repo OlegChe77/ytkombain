@@ -2,8 +2,11 @@
 from __future__ import annotations
 
 import logging
+import shutil
 import threading
+import uuid
 from contextlib import contextmanager
+from pathlib import Path
 from typing import Any, Callable, Iterator
 
 import yt_dlp
@@ -14,6 +17,38 @@ log = logging.getLogger("kombain.ytdlp")
 
 # Ограничиваем число одновременных «лёгких» запросов к YouTube (информация, субтитры, каналы).
 info_slots = threading.BoundedSemaphore(settings.info_concurrency)
+
+# Cookies аккаунта YouTube (YTDLP_COOKIES_FILE). Секретный файл на Render доступен только для чтения,
+# а yt-dlp при закрытии записывает обновлённые cookies обратно. Поэтому работаем с копией во временной
+# папке: каждый запрос получает свою копию, а изменения сохраняются в общую под блокировкой.
+COOKIE_DIR = settings.temp_dir / "cookies"
+_cookie_lock = threading.Lock()
+_cookie_warned = False
+
+
+def _master_cookies() -> Path | None:
+    global _cookie_warned
+    source = settings.cookies_file
+    if not source:
+        return None
+    master = COOKIE_DIR / "cookies.txt"
+    with _cookie_lock:
+        if master.is_file():
+            return master
+        try:
+            COOKIE_DIR.mkdir(parents=True, exist_ok=True)
+            shutil.copyfile(source, master)
+            master.chmod(0o600)
+            return master
+        except OSError as exc:
+            if not _cookie_warned:
+                log.warning("cookies %s недоступны: %s — работаем без них", source, exc)
+                _cookie_warned = True
+            return None
+
+
+def cookies_enabled() -> bool:
+    return _master_cookies() is not None
 
 
 class YdlLogger:
@@ -57,8 +92,6 @@ def base_options(logger: YdlLogger | None = None, **extra: Any) -> dict:
         opts["js_runtimes"] = settings.js_runtimes
     if settings.ffmpeg_location:
         opts["ffmpeg_location"] = settings.ffmpeg_location
-    if settings.cookies_file:
-        opts["cookiefile"] = settings.cookies_file
     if settings.proxy:
         opts["proxy"] = settings.proxy
     # Параметры экстракторов из настроек (YTDLP_EXTRACTOR_ARGS) объединяем с параметрами конкретного запроса.
@@ -73,8 +106,23 @@ def base_options(logger: YdlLogger | None = None, **extra: Any) -> dict:
 
 @contextmanager
 def ydl(logger: YdlLogger | None = None, **extra: Any) -> Iterator[yt_dlp.YoutubeDL]:
-    with yt_dlp.YoutubeDL(base_options(logger, **extra)) as instance:
-        yield instance
+    master = _master_cookies()
+    private = None
+    if master:
+        private = COOKIE_DIR / f"{uuid.uuid4().hex}.txt"
+        with _cookie_lock:
+            shutil.copyfile(master, private)
+        extra["cookiefile"] = str(private)
+    try:
+        with yt_dlp.YoutubeDL(base_options(logger, **extra)) as instance:
+            yield instance
+    finally:
+        if private:
+            with _cookie_lock:
+                # YouTube обновляет часть cookies на ходу — сохраняем свежую версию для следующих запросов.
+                if private.is_file() and private.stat().st_size > 0:
+                    shutil.copyfile(private, master)
+                private.unlink(missing_ok=True)
 
 
 def extract(url: str, logger: YdlLogger | None = None, **extra: Any) -> dict:

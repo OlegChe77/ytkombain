@@ -29,6 +29,10 @@ services:
       # Клиенты YouTube для yt-dlp: с IP дата-центров обычный web-клиент часто упирается в проверку «не бот»
       - key: YTDLP_EXTRACTOR_ARGS
         value: "youtube:player_client=android_vr,tv_simply,web_embedded,visionos"
+      # Cookies запасного аккаунта YouTube: Render → сервис ytkombain → Environment → Secret Files → cookies.txt.
+      # Пока файла нет, сайт работает без него.
+      - key: YTDLP_COOKIES_FILE
+        value: /etc/secrets/cookies.txt
       # На бесплатном тарифе мало памяти и процессора — держим нагрузку скромной
       - key: JOB_WORKERS
         value: "2"
