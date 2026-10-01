@@ -26,7 +26,7 @@
 <a class="clip{% if compact %} clip-compact{% endif %}" href="{{ tool.path }}" data-accepts="{{ tool.accepts|join(' ') }}" style="--track: var(--c-{{ tool.category }})">
   <span class="clip-icon">{{ icon(tool.icon) }}</span>
   <span class="clip-body">
-    <span class="clip-name">{{ tool.name }}</span>
+    <span class="clip-name">{{ tool.name }}{% if tool.slug in player_tools and youtube_limited() %} <span class="clip-soon">скоро</span>{% endif %}</span>
     {% if not compact %}<span class="clip-text">{{ tool.blurb }}</span>{% endif %}
   </span>
 </a>

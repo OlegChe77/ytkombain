@@ -92,3 +92,18 @@ def test_catalog_api(client):
     data = client.get("/api/catalog").json()
     assert len(data["tools"]) == len(TOOLS)
     assert all(t["url"].startswith("/youtube-") for t in data["tools"])
+
+
+def test_soon_notice_only_on_player_tools(client, monkeypatch):
+    import dataclasses
+
+    from app.youtube import ytdlp
+
+    monkeypatch.setattr(ytdlp, "settings", dataclasses.replace(settings, youtube_notice="on"))
+    assert "скоро заработает" in client.get("/youtube-downloader").text
+    assert "скоро заработает" not in client.get("/youtube-thumbnail").text
+    assert client.get("/").text.count('class="clip-soon"') == 10
+
+    monkeypatch.setattr(ytdlp, "settings", dataclasses.replace(settings, youtube_notice="off"))
+    assert "скоро заработает" not in client.get("/youtube-downloader").text
+    assert 'class="clip-soon"' not in client.get("/").text

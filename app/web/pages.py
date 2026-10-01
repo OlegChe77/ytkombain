@@ -14,8 +14,9 @@ from app.config import BASE_DIR, settings
 from app.core.assets import css_bundle, css_url, static_url
 from app.core.security import THEME_BOOT_SCRIPT
 from app.seo import meta as seo
-from app.seo.catalog import (CATEGORIES, CATEGORY_MAP, GENERAL_FAQ, TOOL_MAP, TOOLS, UPDATED, Tool,
+from app.seo.catalog import (CATEGORIES, CATEGORY_MAP, GENERAL_FAQ, PLAYER_TOOLS, TOOL_MAP, TOOLS, UPDATED, Tool,
                              related_tools, tools_in)
+from app.youtube.ytdlp import youtube_limited
 
 router = APIRouter()
 templates = Jinja2Templates(directory=str(BASE_DIR / "templates"))
@@ -28,6 +29,8 @@ templates.env.globals.update(
     tools=TOOLS,
     tool_map=TOOL_MAP,
     tools_in=tools_in,
+    player_tools=PLAYER_TOOLS,
+    youtube_limited=youtube_limited,
     theme_boot=THEME_BOOT_SCRIPT,
     year=date.today().year,
 )

@@ -157,6 +157,7 @@ ffmpeg ставить отдельно не обязательно: если е�
 | `YTDLP_COOKIES_FILE` | — | Cookies в формате Netscape, если YouTube требует вход |
 | `POT_SERVER_DIR` | `/opt/pot` в Docker | Сервер PO-токенов [bgutil](https://github.com/Brainicism/bgutil-ytdlp-pot-provider): приложение запускает его на localhost:4416, статус — `pot_server` в `/api/health` |
 | `YTDLP_PROXY` | — | Прокси для запросов к YouTube |
+| `YOUTUBE_NOTICE` | `auto` | Плашка «временно не работает — скоро заработает» на инструментах, которым нужен плеер YouTube. `auto` — в production, пока нет cookies и прокси; `on` / `off` — принудительно |
 | `MAX_FILESIZE_MB` | 1024 | Максимальный размер файла |
 | `MAX_DOWNLOAD_DURATION_MIN` | 240 | Максимальная длительность скачиваемого видео |
 | `DOWNLOAD_TIMEOUT_S` | 900 | Таймаут подготовки файла |

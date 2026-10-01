@@ -298,6 +298,14 @@ CATEGORIES: tuple[Category, ...] = (
     ),
 )
 
+# Инструменты, которым нужен плеер YouTube (yt-dlp запрашивает само видео). Без cookies или прокси
+# с IP дата-центра они упираются в проверку «не бот» — для них показываем плашку «скоро заработает».
+PLAYER_TOOLS = frozenset({
+    "youtube-downloader", "youtube-audio-downloader", "youtube-shorts-maker", "youtube-video-info",
+    "youtube-transcript", "youtube-tags", "youtube-comment-picker", "youtube-random-comment",
+    "youtube-comment-filter", "youtube-comment-stats",
+})
+
 TOOLS: tuple[Tool, ...] = (
     Tool(
         slug="youtube-downloader", category="video", name="Скачать видео", icon="download", accepts=("video",),

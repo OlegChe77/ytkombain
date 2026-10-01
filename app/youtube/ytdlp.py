@@ -51,6 +51,14 @@ def cookies_enabled() -> bool:
     return _master_cookies() is not None
 
 
+def youtube_limited() -> bool:
+    """Показывать ли на инструментах с плеером YouTube плашку «временно не работает» (YOUTUBE_NOTICE).
+    auto: в production, пока нет ни cookies, ни прокси — с IP дата-центра YouTube отдаёт только проверку «не бот»."""
+    if settings.youtube_notice in {"on", "off"}:
+        return settings.youtube_notice == "on"
+    return settings.is_production and not settings.proxy and not cookies_enabled()
+
+
 class YdlLogger:
     """Передаёт служебные сообщения yt-dlp в колбэк (для прогресса) и гасит вывод в консоль."""
 

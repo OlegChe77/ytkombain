@@ -9,6 +9,15 @@
       <h1>{{ tool.h1 }}</h1>
       <p class="lead">{{ tool.lead }}</p>
     </header>
+    {% if tool.slug in player_tools and youtube_limited() %}
+    <div class="alert alert-warn tool-soon" role="status">
+      {{ icon('alert') }}
+      <div class="alert-body">
+        <strong>Инструмент временно не работает — скоро заработает</strong>
+        <p>YouTube ограничил доступ к видео с нашего сервера, мы уже подключаем решение. Пока работают <a href="/youtube-thumbnail">превью видео</a>, <a href="/category/links">ссылки</a> и <a href="/category/playlists">плейлисты</a>.</p>
+      </div>
+    </div>
+    {% endif %}
     <section class="workspace" id="tool-root" aria-label="{{ tool.name }}"{% for k, v in tool.extra.items() %} data-{{ k }}="{{ v }}"{% endfor %}>
       {% block workspace %}{% endblock %}
     </section>
