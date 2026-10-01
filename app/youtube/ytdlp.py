@@ -66,6 +66,8 @@ class YdlLogger:
 
     def warning(self, msg: str) -> None:
         self.warnings.append(msg)
+        if "pot" in msg.lower() or "po token" in msg.lower() or "bot" in msg.lower():
+            log.warning("yt-dlp: %s", msg[:400])
         if self.on_message:
             self.on_message(msg)
 

@@ -1,7 +1,10 @@
 """Ошибки приложения и перевод сообщений yt-dlp/YouTube в понятный пользователю текст."""
 from __future__ import annotations
 
+import logging
 import re
+
+log = logging.getLogger("kombain.errors")
 
 
 class AppError(Exception):
@@ -76,6 +79,8 @@ def friendly_error(exc: BaseException) -> AppError:
     text = str(exc)
     for pattern, status, code, message, hint in _RULES:
         if pattern.search(text):
+            if code == "blocked":  # исходный текст нужен, чтобы понять, какой клиент YouTube отказал
+                log.warning("YouTube blocked: %s", text[:400])
             return AppError(message, status=status, code=code, hint=hint)
     return AppError("Не получилось обработать ссылку.", status=502, code="upstream",
                     hint="Проверьте ссылку и попробуйте ещё раз. Если ошибка повторяется, YouTube мог изменить формат страницы.")
