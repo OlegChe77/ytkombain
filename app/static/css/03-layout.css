@@ -207,5 +207,7 @@
 .cookie-bar a { color: var(--text); }
 .cookie-actions { display: flex; gap: 8px; }
 .footer-title-gap { margin-top: 22px; }
+.footer-badge { padding-bottom: 24px; }
+.footer-badge img { display: block; max-width: 100%; height: auto; }
 .counter { display: inline-flex; align-items: center; }
 .counter img { display: block; height: 20px; width: auto; }

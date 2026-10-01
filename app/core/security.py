@@ -34,7 +34,8 @@ def _build_csp() -> str:
         f"script-src 'self' '{THEME_BOOT_HASH}' {metrika}",
         "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
         "font-src 'self' https://fonts.gstatic.com",
-        f"img-src 'self' data: blob: {IMAGE_HOSTS} {metrika} {hits}",
+        # https://seotoolkitru.onrender.com — значок SEO-оценки в подвале
+        f"img-src 'self' data: blob: {IMAGE_HOSTS} https://seotoolkitru.onrender.com {metrika} {hits}",
         f"frame-src https://www.youtube-nocookie.com https://www.youtube.com {metrika}",
         f"connect-src 'self' {metrika} {metrika_ws}",
         "media-src 'self' blob:",
