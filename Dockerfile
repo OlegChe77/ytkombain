@@ -13,7 +13,8 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
     TEMP_DIR=/tmp/yt-kombain \
     DENO_DIR=/tmp/yt-kombain/deno \
     XDG_CACHE_HOME=/tmp/yt-kombain/cache \
-    TRUST_PROXY=true \n    POT_SERVER_DIR=/opt/pot
+    TRUST_PROXY=true \
+    POT_SERVER_DIR=/opt/pot
 
 RUN apt-get update \
     && apt-get install -y --no-install-recommends ffmpeg ca-certificates \
