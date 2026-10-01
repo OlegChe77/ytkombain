@@ -46,7 +46,9 @@ async def _supervise(cmd: list[str]) -> None:
     while True:
         started = loop.time()
         try:
-            _proc = await asyncio.create_subprocess_exec(*cmd, cwd=settings.pot_server_dir, env=env)
+            # stdout сервера печатает каждый токен — в журнал Render пускаем только ошибки (stderr).
+            _proc = await asyncio.create_subprocess_exec(*cmd, cwd=settings.pot_server_dir, env=env,
+                                                         stdout=asyncio.subprocess.DEVNULL)
             log.info("сервер PO-токенов запущен (pid %s)", _proc.pid)
             code = await _proc.wait()
             log.warning("сервер PO-токенов завершился с кодом %s", code)
